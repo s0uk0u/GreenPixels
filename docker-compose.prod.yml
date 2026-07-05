@@ -17,7 +17,7 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod
       args:
-        VITE_WS_URL: ws://88.187.93.252/ws
+        VITE_WS_URL: ws://CHANGE_ME/ws
     restart: unless-stopped
 
   server:
@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
     environment:
       - TRUST_PROXY=true
-      - ALLOWED_ORIGIN=http://88.187.93.252
+      - ALLOWED_ORIGIN=CHANGE_ME
       - COOLDOWN_MS=1000
 
 volumes:
