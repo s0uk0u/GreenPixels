@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Green Pixels — Écosystème Cellulaire</title>
+  </head>
+  <body>
+
+    <header class="app-header">
+      <div class="brand">
+        <h1>Green Pixels</h1>
+        <span class="badge">Simulation Live</span>
+      </div>
+      <div class="user-status">
+        <div id="player-name">Génération du pseudo...</div>
+        <div id="status">Connexion au serveur...</div>
+      </div>
+    </header>
+
+    <main class="app-container">
+
+      <aside class="sidebar">
+        <section class="control-group">
+          <h2>Outils de Placement</h2>
+          <p class="help-text">Sélectionnez un élément, puis cliquez sur la grille centrale pour le déployer.</p>
+
+          <div class="select-wrapper">
+            <select id="cell-type">
+              <option value="4">🌱 Graine de plante</option>
+              <option value="1">💧 Eau</option>
+              <option value="2">🟤 Terre</option>
+              <option value="3">⬜ Pierre</option>
+              <option value="5">✨ Nutriment</option>
+              <option value="6">📋 Panneau</option>
+            </select>
+          </div>
+
+          <input id="sign-message" type="text" maxlength="80" placeholder="Message du panneau..." />
+        </section>
+
+        <section class="control-group">
+          <h2>Filtres Visuels</h2>
+          <div class="button-stack">
+            <button id="toggle-lineage" class="btn btn-secondary">🧬 Mode Lignées</button>
+            <button id="toggle-territory" class="btn btn-secondary">🗺️ Mode Territoires</button>
+          </div>
+        </section>
+        <a href="/rules.html"><p>Infos et règles du jeu</p></a>
+      </aside>
+
+      <section class="viewport">
+        <div class="canvas-wrapper">
+          <canvas id="world"></canvas>
+        </div>
+      </section>
+
+      <aside class="inspector-panel">
+        <h2>Inspecteur ADN</h2>
+        <div class="info-container">
+          <div id="cell-info" class="info-content">
+            <p class="muted-text">Survolez une cellule de la grille pour analyser ses composants génétiques et son historique en temps réel.</p>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

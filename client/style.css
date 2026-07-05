@@ -1,0 +1,244 @@
+/* ===========================
+   Variables globales
+=========================== */
+:root {
+  --radius: 8px;
+  --border-color: #2b2f3a;
+  --bg-input: #11141a;
+  --bg-panel: #0d1117;
+  --text-muted: #94a3b8;
+  --text-normal: #cbd5e1;
+}
+
+/* ===========================
+   Layout général
+=========================== */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background-color: #0b0e14;
+  color: var(--text-normal);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #11141a;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 8px;
+  background-color: #22c55e;
+  color: #000;
+  border-radius: var(--radius);
+  font-size: 12px;
+}
+
+.user-status {
+  text-align: right;
+  font-size: 14px;
+}
+
+/* ===========================
+   Conteneur principal
+=========================== */
+.app-container {
+  display: grid;
+  grid-template-columns: 260px 1fr 300px;
+  height: calc(100vh - 70px);
+}
+
+/* ===========================
+   Sidebar gauche
+=========================== */
+.sidebar {
+  background-color: var(--bg-panel);
+  padding: 20px;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+.control-group h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+.help-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.select-wrapper select,
+#sign-message {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-normal);
+  margin-bottom: 12px;
+}
+
+.button-stack button {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #1e293b;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+/* ===========================
+   Zone du Canvas
+=========================== */
+.viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-image: radial-gradient(rgba(36, 47, 70, 0.3) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  overflow: auto;
+}
+
+.canvas-wrapper {
+  background-color: #0b0e14;
+  padding: 8px;
+  border-radius: calc(var(--radius) + 4px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+  display: inline-block;
+}
+
+#world {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+  background-color: #1a1a1a;
+}
+
+/* ===========================
+   Inspecteur ADN
+=========================== */
+.inspector-panel {
+  background-color: var(--bg-panel);
+  padding: 20px;
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+.inspector-panel h2 {
+  margin-top: 0;
+}
+
+.info-container {
+  flex: 1;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 16px;
+  overflow-y: auto;
+}
+
+#cell-info {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-normal);
+}
+
+#cell-info strong {
+  color: #fff;
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+}
+/* ===========================
+   Responsive Mobile
+=========================== */
+@media (max-width: 768px) {
+
+  /* Layout général : 1 colonne */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+  }
+
+  /* Header : centré */
+  .app-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  /* Sidebar : pleine largeur */
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  /* Canvas : prend toute la largeur */
+  .viewport {
+    padding: 10px;
+  }
+
+  .canvas-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #world {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Inspecteur ADN : pleine largeur */
+  .inspector-panel {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+  }
+
+  /* Textes plus petits */
+  .sidebar h2,
+  .inspector-panel h2 {
+    font-size: 16px;
+  }
+
+  .help-text,
+  #cell-info {
+    font-size: 12px;
+  }
+
+  /* Boutons : plus grands et plus espacés */
+  .button-stack button {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  /* Inputs */
+  select,
+  input[type="text"] {
+    font-size: 14px;
+  }
+}

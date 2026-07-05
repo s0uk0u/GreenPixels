@@ -1,0 +1,35 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+        - "80:80"   # tu peux le laisser même si TLS est off
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - client
+      - server
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_WS_URL: ws://88.187.93.252/ws
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      - TRUST_PROXY=true
+      - ALLOWED_ORIGIN=http://88.187.93.252
+      - COOLDOWN_MS=1000
+
+volumes:
+  caddy_data:
+  caddy_config:

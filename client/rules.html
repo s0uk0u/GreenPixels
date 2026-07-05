@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Green Pixels — Écosystème Cellulaire</title>
+  </head>
+  <body>
+	
+
+  <h1>Simulation d&apos;Écosystème</h1>
+
+  <div class="section">
+    <h2>1. Types et Structures de Données Essentielles</h2>
+
+    <h3>CellType</h3>
+    <p>L&apos;état d&apos;une case est représenté par l&apos;interface <code>Cell</code>. Une cellule possède un type principal (<code>CellType</code>) et des attributs optionnels spécifiques :</p>
+    <ul>
+      <li><strong>Empty</strong> : <code>0</code></li>
+      <li><strong>Plant</strong> : <code>1</code></li>
+      <li><strong>Water</strong> : <code>2</code></li>
+      <li><strong>Nutrient</strong> : <code>3</code></li>
+      <li><strong>Sign</strong> : <code>4</code></li>
+    </ul>
+
+    <h3>PlantGenes</h3>
+    <p>Configuration génétique d&apos;une plante :</p>
+    <ul>
+      <li><strong>croissance</strong> : Seuil d&apos;énergie nécessaire pour se reproduire.</li>
+      <li><strong>propagation</strong> : Probabilité / taux de mutation.</li>
+      <li><strong>resistance</strong> : Capacité à survivre avec une énergie négative.</li>
+      <li><strong>distance</strong> : Rayon d&apos;action pour capter l&apos;eau ou interagir.</li>
+      <li><strong>hydratation</strong> : Tolérance au manque d&apos;eau.</li>
+      <li><strong>densite</strong> : Tolérance à la surpopulation.</li>
+      <li><strong>graines</strong> : Nombre maximal d&apos;enfants par cycle de reproduction.</li>
+    </ul>
+
+    <h3>Cell</h3>
+    <p>Attributs optionnels de la cellule :</p>
+    <ul>
+      <li><strong>energy?</strong>, <strong>age?</strong>, <strong>genes?</strong>, <strong>lineage?</strong> (spécifiques aux plantes).</li>
+      <li><strong>message?</strong> (spécifique aux panneaux / <code>Sign</code>).</li>
+      <li><strong>createdBy?</strong> : Identifiant du joueur ou IP.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>2. Logique Métier &amp; Règles de Simulation (Moteur de Règles)</h2>
+    <p>Le <code>RuleEngine</code> traite chaque tick de manière pure : il parcourt la grille, délègue le comportement de la cellule à sa règle enregistrée, accumule les changements, puis les applique en bloc. Cela empêche qu&apos;une cellule modifiée n&apos;influence d&apos;autres cellules au cours du même cycle de calcul.</p>
+
+    <h3>A. La Règle des Plantes (<code>plantRule</code>)</h3>
+    <p>C&apos;est le cœur de la simulation. À chaque itération :</p>
+    <ul>
+      <li><strong>Vieillissement</strong> : L&apos;âge augmente de 1.</li>
+      <li><strong>Gestion de l&apos;Eau</strong> :
+        <ul>
+          <li>La plante cherche de l&apos;eau (<code>CellType.Water</code>) dans son rayon de gènes <code>distance</code>.</li>
+          <li>Si aucune source d&apos;eau n&apos;est présente, son énergie diminue de <code>3 - hydratation</code> (minimum 1).</li>
+          <li>Si elle trouve de l&apos;eau, son énergie augmente de 1 (plafonné à <code>ENERGIE_MAX = 6</code>).</li>
+        </ul>
+      </li>
+      <li><strong>Surpopulation</strong> :
+        <ul>
+          <li>Elle compte le nombre de plantes dans son rayon d&apos;action.</li>
+          <li>Si ce nombre dépasse <code>SURPOPULATION_HARD + densite</code> (7 + gène), la plante meurt immédiatement (<code>CellType.Empty</code>).</li>
+          <li>Si ce nombre dépasse <code>SURPOPULATION_SOFT + densite</code> (5 + gène), elle perd 2 points d&apos;énergie.</li>
+        </ul>
+      </li>
+      <li><strong>Mortalité</strong> : Si l&apos;énergie de la plante descend en dessous de <code>-resistance</code>, la plante meurt.</li>
+      <li><strong>Mutualisme Inter-Joueurs</strong> :
+        <ul>
+          <li>Si une plante voisine appartient à un autre joueur et possède un déficit d&apos;énergie conséquent (écart ≥ 2), la plante donne volontairement 1 point d&apos;énergie à sa voisine (un seul don par tick).</li>
+        </ul>
+      </li>
+      <li><strong>Reproduction &amp; Mutation</strong> :
+        <ul>
+          <li>Si l&apos;énergie accumulée atteint le seuil déterminé par le gène <code>croissance</code>, la plante tente de générer des graines (quantité définie par le gène <code>graines</code>) sur les cases vides avoisinantes.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h4>Système de Mutation Génétique</h4>
+    <ul>
+      <li><strong>Mutation de base</strong> :
+        <ul>
+          <li>Lors de la reproduction, chaque gène a une chance (20%) de muter de ±1 (ou ±0.05 pour la <code>propagation</code>).</li>
+        </ul>
+      </li>
+      <li><strong>Mutation forte</strong> détectée si :</li>
+      <ul>
+        <li>Un gène majeur varie de ≥ 2.</li>
+        <li>La somme absolue de toutes les variations de gènes est ≥ 4.</li>
+        <li>Au moins 3 gènes changent simultanément.</li>
+      </ul>
+      <li><strong>Création de lignée</strong> :
+        <ul>
+          <li>Si une mutation forte survient, une nouvelle lignée génétique est officiellement créée avec un nom unique (généré de type <code>Aube-Dense-42</code>).</li>
+          <li>Sinon, l&apos;enfant conserve le nom de lignée de son parent.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>B. La Règle des Nutriments (<code>nutrientRule</code>)</h3>
+    <ul>
+      <li><strong>Effet</strong> : Les nutriments agissent comme des multiplicateurs d&apos;énergie à quantité fixe (<code>NUTRIENT_BOOST = 3</code>).</li>
+      <li><strong>Détection</strong> : Ils détectent les plantes adjacentes.</li>
+      <li><strong>Regroupement</strong> : Ils regroupent les plantes par propriétaire unique (joueur).</li>
+      <li><strong>Distribution</strong> :
+        <ul>
+          <li>L&apos;énergie totale du nutriment est divisée équitablement entre les différents joueurs présents à son contact.</li>
+          <li>Chaque joueur reçoit sa part d&apos;énergie sur l&apos;une de ses plantes.</li>
+        </ul>
+      </li>
+      <li><strong>Consommation</strong> : Le nutriment est instantanément consommé (<code>CellType.Empty</code>).</li>
+    </ul>
+
+    <h3>C. La Règle de l&apos;Eau (<code>waterRule</code>)</h3>
+    <p>L&apos;eau n&apos;est pas une ressource infinie et peut s&apos;épuiser sous la pression de l&apos;écosystème :</p>
+    <ul>
+      <li><strong>Plantes assoiffées</strong> :
+        <ul>
+          <li>La source d&apos;eau comptabilise les plantes environnantes dites &laquo; assoiffées &raquo; (ayant un gène <code>hydratation ≤ 1</code>).</li>
+        </ul>
+      </li>
+      <li><strong>Épuisement de la source</strong> :
+        <ul>
+          <li>Si au moins 4 plantes assoiffées puisent dedans simultanément, la source d&apos;eau a 5% de chances à chaque tick de s&apos;assécher et de disparaître de la grille.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+    
+  </body>
+</html>

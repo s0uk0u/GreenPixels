@@ -1,0 +1,29 @@
+services:
+  server:
+    build: ./server
+    ports:
+      - "8080:8080"
+    volumes:
+      # Le code source est monté en direct : modifier un fichier sur Windows
+      # redémarre le serveur (tsx watch) sans reconstruire l'image.
+      - ./server:/app
+      # Volume nommé séparé pour node_modules : ça évite que le montage du
+      # dossier hôte (qui n'a pas de node_modules) n'écrase celui installé
+      # dans l'image au moment du build.
+      - server_node_modules:/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+    depends_on:
+      - server
+
+volumes:
+  server_node_modules:
+  client_node_modules:

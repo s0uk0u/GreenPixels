@@ -1,0 +1,8 @@
+http://88.187.93.252 {
+    @ws {
+        path /ws
+    }
+    reverse_proxy @ws server:8080
+
+    reverse_proxy client:80
+}
